@@ -19,6 +19,7 @@ UPROGS=\
 	_rm\
 	_sh\
 	_stressfs\
+	_uptime\
 	_usertests\
 	_wc\
 	_zombie\
