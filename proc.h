@@ -1,5 +1,6 @@
 #ifndef PROC_INCLUDE_
 #define PROC_INCLUDE_
+#define NPROC 64
 
 // Per-CPU state, now we only support one CPU
 struct cpu {
@@ -67,6 +68,7 @@ struct proc {
     struct file*    ofile[NOFILE];  // Open files
     struct inode*   cwd;            // Current directory
     char            name[16];       // Process name (debugging)
+    int             syscall_count;  // Count of System Calls
 };
 
 // Process memory is laid out contiguously, low addresses first:

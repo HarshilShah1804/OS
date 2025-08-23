@@ -17,6 +17,7 @@ UPROGS=\
 	_ls\
 	_mkdir\
 	_pause\
+	_ps\
 	_rm\
 	_sh\
 	_stressfs\

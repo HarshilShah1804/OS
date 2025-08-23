@@ -114,6 +114,7 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
+extern int sys_getpocs(void);
 
 static int (*syscalls[])(void) = {
         [SYS_fork]    sys_fork,
@@ -137,6 +138,7 @@ static int (*syscalls[])(void) = {
         [SYS_link]    sys_link,
         [SYS_mkdir]   sys_mkdir,
         [SYS_close]   sys_close,
+        [SYS_getprocs] sys_getprocs,
 };
 
 void syscall(void)
@@ -147,6 +149,7 @@ void syscall(void)
     num = proc->tf->r0;
 
     //cprintf ("syscall(%d) from %s(%d)\n", num, proc->name, proc->pid);
+    proc->syscall_count++;
 
     if((num > 0) && (num <= NELEM(syscalls)) && syscalls[num]) {
         ret = syscalls[num]();

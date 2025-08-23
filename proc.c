@@ -6,6 +6,7 @@
 #include "arm.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "stat.h"
 
 //
 // Process initialization:
@@ -495,12 +496,7 @@ int kill(int pid)
     return -1;
 }
 
-//PAGEBREAK: 36
-// Print a process listing to console.  For debugging. Runs when user
-// types ^P on console. No lock to avoid wedging a stuck machine further.
-void procdump(void)
-{
-    static char *states[] = {
+static char *states[] = {
             [UNUSED]    "unused",
             [EMBRYO]    "embryo",
             [SLEEPING]  "sleep ",
@@ -508,6 +504,39 @@ void procdump(void)
             [RUNNING]   "run   ",
             [ZOMBIE]    "zombie"
     };
+
+int
+sys_getprocs(void)
+{
+    struct pstat* pstat_user;
+    struct proc* p;
+    int i=0;
+    if (argptr(0, (void*)&pstat_user, sizeof(struct pstat) * NPROC) < 0)
+        return -1;
+
+    acquire(&ptable.lock);
+
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if (p->state != UNUSED) {
+            pstat_user[i].inuse = 1;
+            pstat_user[i].pid = p->pid;
+            pstat_user[i].ppid = p->parent ? p->parent->pid : 0;
+            safestrcpy(pstat_user[i].name, p->name, sizeof(p->name));
+            safestrcpy(pstat_user[i].state, states[p->state], sizeof(pstat_user[i].state));
+            pstat_user[i].syscalls = p->syscall_count;
+            i++;
+        }
+    }
+    
+    release(&ptable.lock);
+    return i;
+}
+
+//PAGEBREAK: 36
+// Print a process listing to console.  For debugging. Runs when user
+// types ^P on console. No lock to avoid wedging a stuck machine further.
+void procdump(void)
+{
 
     struct proc *p;
     char *state;

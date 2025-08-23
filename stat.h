@@ -9,3 +9,12 @@ struct stat {
     short   nlink; // Number of links to file
     uint    size;  // Size of file in bytes
 };
+
+struct pstat {
+    int inuse;
+    int pid;
+    int ppid;
+    char name[16];
+    char state[16];
+    int syscalls;
+};
