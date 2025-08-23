@@ -6,6 +6,7 @@
 #include "defs.h"
 #include "param.h"
 #include "spinlock.h"
+#include "defs.h"
 #include "fs.h"
 #include "file.h"
 #include "memlayout.h"
@@ -165,12 +166,50 @@ struct {
     uint e;  // Edit index
 } input;
 
-static char *commands[] = {
-  "ls", "echo", "cat", "ps", "grep", "kill", "init", "sh", "clear"
-};
-static int ncommands = sizeof(commands) / sizeof(commands[0]);
+// To store the possible commands from the usr directory
+static char commands[32][32];
+static int ncommands = 0;  // To keep the count of number of commands
+
+// Compare if 2 strings are equal or not. If equal return 0;
+int strcmp(const char *s1, const char *s2) {
+    while (*s1 && (*s1 == *s2)) {
+        s1++;
+        s2++;
+    }
+    return (unsigned char)*s1 - (unsigned char)*s2;
+}
+
+// Similar implementation to `ls` command which fetches 
+// the possible commands and shows them dynamically
+static void
+loadCommands(void)
+{
+    struct inode *usr_path = namei("/");
+
+    ncommands = 0;
+
+    struct dirent de;
+
+    for(int i = 0; i < usr_path->size; i += sizeof(de)){
+        // Read from the usr directory to get the possible commands
+        if(readi(usr_path, (char*)&de, i, sizeof(de)) != sizeof(de))
+            continue;
+        if(de.inum == 0)
+            continue;
+
+        // `ls` also returns "." & ".." which are not commands, and can be ignored in tab
+        if(strcmp(de.name, ".") == 0 || strcmp(de.name, "..") == 0)
+            continue;
+
+        // Copy the command in 
+        safestrcpy(commands[ncommands], de.name, DIRSIZ);
+        ncommands++;
+    }
+}
+
 
 void tabComplete() {
+    loadCommands();
     int len = input.e - input.r;  // current useful buffer length
     if(len <= 0)
         return;
