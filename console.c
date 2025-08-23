@@ -165,6 +165,45 @@ struct {
     uint e;  // Edit index
 } input;
 
+static char *commands[] = {
+  "ls", "echo", "cat", "ps", "grep", "kill", "init", "sh", "clear"
+};
+static int ncommands = sizeof(commands) / sizeof(commands[0]);
+
+void tabComplete() {
+    int len = input.e - input.r;  // current useful buffer length
+    if(len <= 0)
+        return;
+
+    char buf[INPUT_BUF];
+    memmove(buf, input.buf + input.r, len);  // Move the current command data to a seperate buffer
+    buf[len] = '\0';
+
+    int matchCount = 0;
+    char *matches[ncommands];
+
+    // store all matched commands
+    for(int i = 0; i < ncommands; i++) {
+        if(strncmp(commands[i], buf, len) == 0) {
+            matches[matchCount++] = commands[i];
+        }
+    }
+
+    if(matchCount == 1) {
+        // Single command => Complete on the terminal as well as buffer
+        for(int j = len; matches[0][j]; j++) {
+            consputc(matches[0][j]);  // terminal
+            input.buf[input.e++ % INPUT_BUF] = matches[0][j];  // buffer
+        }
+    } else if(matchCount > 1) {
+        cprintf("\n");
+        for(int i = 0; i < matchCount; i++) {
+            cprintf("%s  ", matches[i]);
+        }
+        cprintf("\n$ %s", buf);  // reprint prompt and buffer
+    }
+}
+
 #define C(x)  ((x)-'@')  // Control-x
 void consoleintr (int (*getc) (void))
 {
@@ -185,7 +224,11 @@ void consoleintr (int (*getc) (void))
             }
 
             break;
-
+        
+        case C('I'): {  // Tab key (Autocomplete)
+            tabComplete();
+            break;
+        }
         case C('H'):
         case '\x7f':  // Backspace
             if (input.e != input.w) {
