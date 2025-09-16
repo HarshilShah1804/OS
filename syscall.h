@@ -21,3 +21,6 @@
 #define SYS_mkdir  20
 #define SYS_close  21
 #define SYS_getprocs 22
+#define SYS_ugetpid 23
+#define SYS_kpt   24
+#define SYS_pgpte 25

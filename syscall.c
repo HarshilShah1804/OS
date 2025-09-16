@@ -115,6 +115,9 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_getpocs(void);
+extern int sys_ugetpid(void);
+extern int sys_kpt(void);
+extern int sys_pgpte(void);
 
 static int (*syscalls[])(void) = {
         [SYS_fork]    sys_fork,
@@ -139,6 +142,9 @@ static int (*syscalls[])(void) = {
         [SYS_mkdir]   sys_mkdir,
         [SYS_close]   sys_close,
         [SYS_getprocs] sys_getprocs,
+        [SYS_ugetpid] sys_ugetpid,
+        [SYS_kpt]     sys_kpt,
+        [SYS_pgpte]   sys_pgpte,
 };
 
 void syscall(void)

@@ -1,5 +1,6 @@
 struct stat;
 struct pstat;
+typedef uint32	pte_t;
 
 // system calls
 int fork(void);
@@ -24,6 +25,9 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int getprocs(struct pstat*);
+int ugetpid(void);
+void kpt(void);
+uint32 pgpte(void* va);
 
 // ulib.c
 int stat(char*, struct stat*);

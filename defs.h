@@ -204,4 +204,6 @@ void*           kpt_alloc(void);
 void            init_vmm (void);
 void            kpt_freerange (uint32 low, uint32 hi);
 void            paging_init (uint phy_low, uint phy_hi);
+void            kpt(void);
+uint32         pgpte(void* va);
 #endif

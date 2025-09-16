@@ -94,3 +94,24 @@ int sys_uptime(void)
 
     return xticks;
 }
+
+int sys_ugetpid(void)
+{
+    return proc->pid;
+}
+
+int
+sys_kpt(void)
+{
+  kpt();     // Call kernel function
+  return 0;  // nothing to return
+}
+
+
+uint32
+sys_pgpte(void) {
+    void *va;
+    if(argptr(0, (void*)&va, sizeof(void*)) < 0)
+        return 0;
+    return pgpte(va);
+}

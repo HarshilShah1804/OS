@@ -445,3 +445,20 @@ void paging_init (uint phy_low, uint phy_hi)
     mappages (P2V(&_kernel_pgtbl), P2V(phy_low), phy_hi - phy_low, phy_low, AP_KU);
     flush_tlb ();
 }
+
+void kpt() 
+{
+    cprintf("kpgdir at %x\n", kpgdir);
+}
+
+#define MAXVA (1ULL << (9 + 9 + 9 + 12 - 1))
+#define PGSIZE 4096
+#define PTE_V (1ULL << 0)
+
+uint32
+pgpte(void *va)
+{
+    pte_t *pte = walkpgdir((pde_t*)_kernel_pgtbl, va, 0);
+    if (!pte) return 0;
+    return *pte;
+}
